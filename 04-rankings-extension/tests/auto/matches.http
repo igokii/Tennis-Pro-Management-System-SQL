@@ -1,0 +1,162 @@
+
+### This is an auto-generated test suite, it needs to be completed with valid data.
+### These are not all tests you need, more of them should be created to evaluate the functional
+### requirements of your project. These tests only test the CRUD endpoints of the entity.
+### Silence is a DEAL research team project, more info about us in https://deal.us.es
+@BASE = http://127.0.0.1:8080/api/v1
+
+### Auxiliary query
+### Positive test
+### Test 00: Get all existing matches
+### This query is used in several of the below tests it should be executed first.
+# @name matches
+GET {{BASE}}/matches
+
+### Login a(n) users and save the generated token 
+### This token is used in several of the below tests it should be executed second.
+# @name login
+POST {{BASE}}/login 
+Content-Type: application/json 
+
+{ 
+	"username": ###REPLACE###,
+	"password": ###REPLACE###
+}
+
+###
+@token = {{login.response.body.sessionToken}}
+
+
+### TESTS BEGIN
+
+### Test 01: Get one existing matches by its id.
+### positive test 
+@matId = {{matches.response.body.0.match_id}}
+GET {{BASE}}/matches/{{matId}} 
+Content-Type: application/json 
+
+
+### Test 02: Try get one existing matches by its nonexistent id.
+### negative test 
+GET {{BASE}}/matches/999999999
+Content-Type: application/json 
+
+
+### Test 03: Add a new matches successfully
+### Positive test 
+### We assume that the token has been aquired by the login request.
+# @name newmatches
+POST {{BASE}}/matches 
+Content-Type: application/json 
+Token: {{token}} 
+
+{
+	"referee_id": ###REPLACE###,
+	"player1_id": ###REPLACE###,
+	"player2_id": ###REPLACE###,
+	"winner_id": ###REPLACE###,
+	"tournament": ###REPLACE###,
+	"match_date": ###REPLACE###,
+	"round": ###REPLACE###,
+	"duration": ###REPLACE###
+} 
+
+### Check the created matches
+
+@newmatchesid = {{newmatches.response.body.lastId}}
+GET {{BASE}}/matches/{{newmatchesid}}
+Content-Type: application/json 
+
+### Test 04: Add a new matches without a session token
+### Negative test 
+POST {{BASE}}/matches 
+Content-Type: application/json 
+
+{ 
+	"referee_id": ###REPLACE###,
+	"player1_id": ###REPLACE###,
+	"player2_id": ###REPLACE###,
+	"winner_id": ###REPLACE###,
+	"tournament": ###REPLACE###,
+	"match_date": ###REPLACE###,
+	"round": ###REPLACE###,
+	"duration": ###REPLACE###
+}
+
+### Test 05: Modify an existing matches 
+### Positive test 
+@matId = {{matches.response.body.0.match_id}} 
+PUT {{BASE}}/matches/{{matId}} 
+Content-Type: application/json 
+Token: {{token}} 
+
+{ 
+	"referee_id": ###REPLACE###,
+	"player1_id": ###REPLACE###,
+	"player2_id": ###REPLACE###,
+	"winner_id": ###REPLACE###,
+	"tournament": ###REPLACE###,
+	"match_date": ###REPLACE###,
+	"round": ###REPLACE###,
+	"duration": ###REPLACE###
+}
+
+### Check the modified matches
+
+GET {{BASE}}/matches/{{newmatchesid}}
+Content-Type: application/json 
+
+### Test 06: Try to modify an existing matches without a session token
+### Negative test
+@matId = {{matches.response.body.0.match_id}}
+PUT {{BASE}}/matches/{{matId}}
+Content-Type: application/json
+
+{
+	"referee_id": ###REPLACE###,
+	"player1_id": ###REPLACE###,
+	"player2_id": ###REPLACE###,
+	"winner_id": ###REPLACE###,
+	"tournament": ###REPLACE###,
+	"match_date": ###REPLACE###,
+	"round": ###REPLACE###,
+	"duration": ###REPLACE###
+}
+
+### Test 07: Delete an existing matches
+### Positive test
+
+### Create a new matches, which we will delete
+# @name createdmatToDelete
+POST {{BASE}}/matches
+Content-Type: application/json
+Token: {{token}}
+
+{
+	"referee_id": ###REPLACE###,
+	"player1_id": ###REPLACE###,
+	"player2_id": ###REPLACE###,
+	"winner_id": ###REPLACE###,
+	"tournament": ###REPLACE###,
+	"match_date": ###REPLACE###,
+	"round": ###REPLACE###,
+	"duration": ###REPLACE###
+}
+
+### Check the created matches
+@matdelId = {{createdmatToDelete.response.body.lastId}}
+GET {{BASE}}/matches/{{matdelId}}
+Content-Type: application/json 
+
+### Delete the matches
+DELETE {{BASE}}/matches/{{matdelId}}
+Token: {{token}}
+
+### Check the deleted matches
+GET {{BASE}}/matches/{{matdelId}}
+Content-Type: application/json 
+
+### Test 08: Try to delete a matches without a session token
+### Negative test
+DELETE {{BASE}}/matches/{{matId}}
+
